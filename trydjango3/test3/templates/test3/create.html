@@ -1,0 +1,10 @@
+{% extends 'test3/base.html' %} {% block body %}
+<style>
+    textarea {
+        resize: vertical;
+    }
+</style>
+<form method="POST">
+    {% csrf_token %} {{ form.as_p }}
+    <input type="submit"> {% endblock body %}
+</form>
