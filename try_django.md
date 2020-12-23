@@ -47,6 +47,8 @@
   - [x] decimal_places=2 is required.
   - [x] max_digits=1000 is required.
 - [x] **BooleanField**
+- [ ] **FileField**
+  - [ ] upload_to="images/"
 
 
 ## Commands
@@ -105,8 +107,11 @@ def product_detail_view(request):
 - [x] .GET dictionary that contains data sent through get request.
 - [x] .POST dictionary contains data sent through post request.
 ##### ModelName.objects
-- [x] .get
+- [x] .get(id=[number])
+  - [ ] This must return exactly one object.
 - [x] .create(**dictionary) or .create(attribute1=value1, attribute2=value2 ...)
+- [ ] .filter(attr1=value1, attr2=value2)
+  - [ ] returns a list of objects.
 
 ### urls.py
 - [x] Best practice is to create a urls.py for each app and include it in the main project urls.py.
@@ -228,3 +233,7 @@ def clean_title(self, *args, **kwargs):
     raise forms.ValidationError("Title must contain 'NEWS'")
   return title
 ```
+
+### admin.py
+- [ ] Register models to be viewed from admin page.
+  - [ ] admin.site.register(ModelName)
