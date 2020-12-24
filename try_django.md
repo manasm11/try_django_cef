@@ -21,6 +21,7 @@
 - [x] **ROOT_URLCONF**
   - [x] Tells django how to manage routes.
 - [x] **TEMPLATES**
+  - [ ] Create a templates directory with base.html inside it and respective folders for apps.
   - [x] How are html templates rendered, where are they stored.
   - [x] In DIRS list, add os.path.join(BASE_DIR, "templates").
 - [x] **WSGI_APPLICATION**
@@ -83,7 +84,7 @@
 - [x] Takes a request object as argument.
 - [x] Conventionally, functions end with _view.
 - [x] Add *args, **kwargs also as arguments in function definitions.
-- [x] Returns either HttpResponse or render(request, template_name, context_dictionary)
+- [x] Returns either HttpResponse(html_string) or render(request, template_name, context_dictionary) or JsonResponse(data)
 - [x] Convention is to pass model objects as 'object' in context, and then access the attributes from it.
 - [x] To use forms, Eg:
 ```py
@@ -113,6 +114,31 @@ def product_detail_view(request):
 - [ ] .filter(attr1=value1, attr2=value2)
   - [ ] returns a list of objects.
 - [ ] model_object.save() can be used to save the model_objects.
+- [ ] To render error if id is incorrect:
+```py
+def tweet_detail_view(request, tweet_id,  *args, **kwargs):
+  try:
+      obj = TweetModel.objects.get(id=tweet_id)
+  except :
+      raise Http404(f"TweetModel with id={tweet_id} not found.")
+  return HttpResponse(f"<h1>Testing {tweet_id} {obj.content}</h1>")
+```
+- [ ] **Sending JSON response**:
+  - [ ] Eg:
+  ```py
+    def tweet_detail_view(response, tweet_id, *args, **kwargs):
+      data = {
+        'id':tweet_id
+      }
+      status = 200
+      try:
+        obj = TweetModel.objects.get(id=tweet_id)
+        data['content'] = obj.content
+      except:
+        data['message'] = "Not found"
+        status = 404
+      return JsonResponse(data, status=status)
+  ```
 
 ### urls.py
 - [x] Best practice is to create a urls.py for each app and include it in the main project urls.py.
@@ -126,6 +152,7 @@ def product_detail_view(request):
     def tweet_detail_view(request, tweet_id, *args, **kwargs):
       return HttpResponse(f"tweet_id={tweet_id}")
 ```
+- [ ] Instead or path, re_path can be used to add paths with regular expressions.
 
 ### templates
 - [x] Django first looks at the DIRS list for templates, then in installed apps templates directory (in sequence).
