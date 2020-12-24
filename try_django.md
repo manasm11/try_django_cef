@@ -112,6 +112,7 @@ def product_detail_view(request):
 - [x] .create(**dictionary) or .create(attribute1=value1, attribute2=value2 ...)
 - [ ] .filter(attr1=value1, attr2=value2)
   - [ ] returns a list of objects.
+- [ ] model_object.save() can be used to save the model_objects.
 
 ### urls.py
 - [x] Best practice is to create a urls.py for each app and include it in the main project urls.py.
