@@ -118,6 +118,14 @@ def product_detail_view(request):
 - [x] Best practice is to create a urls.py for each app and include it in the main project urls.py.
 - [x] Copy paste main project urls.py to create apps urls.py.
 - [x] Adding urls is given in the starter page.
+- [ ] To add dynamic urls,:
+```py
+  # In urls.py
+    path('tweets/<int:tweet_id>', tweet_detail_view)
+  # In views.py
+    def tweet_detail_view(request, tweet_id, *args, **kwargs):
+      return HttpResponse(f"tweet_id={tweet_id}")
+```
 
 ### templates
 - [x] Django first looks at the DIRS list for templates, then in installed apps templates directory (in sequence).
