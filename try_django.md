@@ -84,7 +84,7 @@
 - [x] Takes a request object as argument.
 - [x] Conventionally, functions end with _view.
 - [x] Add *args, **kwargs also as arguments in function definitions.
-- [x] Returns either HttpResponse(html_string) or render(request, template_name, context_dictionary) or JsonResponse(data)
+- [x] Returns HttpResponse(html_string), render(request, template_name, context_dictionary), JsonResponse(data) or redirect(url)
 - [x] Convention is to pass model objects as 'object' in context, and then access the attributes from it.
 - [x] To use forms, Eg:
 ```py
