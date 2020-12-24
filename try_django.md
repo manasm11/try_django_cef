@@ -124,7 +124,7 @@ def tweet_detail_view(request, tweet_id,  *args, **kwargs):
   return HttpResponse(f"<h1>Testing {tweet_id} {obj.content}</h1>")
 ```
 - [ ] **Sending JSON response**:
-  - [ ] Eg:
+  - [ ] Eg of one data:
   ```py
     def tweet_detail_view(response, tweet_id, *args, **kwargs):
       data = {
@@ -138,6 +138,14 @@ def tweet_detail_view(request, tweet_id,  *args, **kwargs):
         data['message'] = "Not found"
         status = 404
       return JsonResponse(data, status=status)
+  ```
+  - [ ] Eg of list:
+  ```py
+  def tweet_list_view(response, tweet_id, *args, **kwargs):
+    data = {
+      'response':[{'id':x.id, 'content':x.content} for x in TweetModel.objects.all()]
+    }
+    return JsonResponse(data)
   ```
 
 ### urls.py
