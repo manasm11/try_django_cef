@@ -12,6 +12,7 @@ from .models import TweetModel
 class TweetSerializer(serializers.ModelSerializer):
     class Meta:
         model = TweetModel
+        fields = ['content']
     
     def validate_content(self, value):
         if len(value)>MAX_TWEET_LENGTH:
@@ -29,7 +30,7 @@ from .serializer import TweetSerializer
 from .model import TweetModel
 
 @api_view(['POST']) # Only allows post request
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated]) # This should be below of api_view, else it gives some internal error.
 def tweet_create_view(request, *args, **kwargs):
     serializer = TweetSerializer(data=request.POST)
     if serializer.is_valid(raise_exception=True):
