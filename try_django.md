@@ -50,7 +50,21 @@
 - [x] **BooleanField**
 - [ ] **FileField**
   - [ ] upload_to="images/"
+- [ ] **ForeignKey**
+  - [ ] First argument must be the other model.
+  - [ ] on_delete=models.CASCADE is required
+  - [ ] on_delete=models.SET_NULL, null=True can also be set.
+##### Associating Users to Models
+- [ ] Eg:
+```py
+from django.conf import settings
 
+User = settings.AUTH_USER_MODEL
+
+class TweetModel(models.Model):
+  content = models.TextField(blank=True, null=True)
+  user = models.ForeignKey(User, on_delete=models.CASCADE)
+```
 
 ## Commands
 ### manage.py
@@ -92,7 +106,9 @@ from .forms import ProductForm
 def product_detail_view(request):
   form = ProductForm(request.POST or None)
   if form.is_valid():
-    form.save()
+    obj = form.save(commit=false)
+    # Play with objects
+    obj.save()
   context['form'] = form
 ```
 - [x] form.cleaned_data can be used to clean data.
@@ -107,12 +123,15 @@ def product_detail_view(request):
   - [x] can have value 'GET', 'POST' or few other methods.
 - [x] .GET dictionary that contains data sent through get request.
 - [x] .POST dictionary contains data sent through post request.
+- [ ] .is_ajax() : Tells if the request is ajax or not.
 ##### ModelName.objects
 - [x] .get(id=[number])
   - [ ] This must return exactly one object.
 - [x] .create(**dictionary) or .create(attribute1=value1, attribute2=value2 ...)
 - [ ] .filter(attr1=value1, attr2=value2)
   - [ ] returns a list of objects.
+  - [ ] **.filter(foreign_model__foreign_attr="value")**
+  - [ ] .filter(attr__iexact="VaLUe") [Ignores exact match]
 - [ ] model_object.save() can be used to save the model_objects.
 - [ ] To render error if id is incorrect:
 ```py
@@ -281,3 +300,13 @@ def clean_title(self, *args, **kwargs):
 ### admin.py
 - [ ] Register models to be viewed from admin page.
   - [ ] admin.site.register(ModelName)
+- [ ] Search by fields and show fields.
+  - [ ] Eg:
+```py
+class TweetAdmin(models.ModelAdmin):
+  list_display = ['__str__', 'user']
+  search_fields = ['content', 'user__username', 'user__email']
+  class Meta:
+    model = Tweet
+admin.site.register(Tweet, TweetAdmin)
+```
