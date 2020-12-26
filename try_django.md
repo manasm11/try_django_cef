@@ -54,6 +54,12 @@
   - [ ] First argument must be the other model.
   - [ ] on_delete=models.CASCADE is required
   - [ ] on_delete=models.SET_NULL, null=True can also be set.
+- [ ] ManyToManyField : 
+  - [ ] through [can have an intermediate model eg TweetLike]
+  - [ ] .add
+  - [ ] .remove
+  - [ ] .set  [requires a querySet]
+  - [ ] May have to pass other model as a string if it is defined later.
 ##### Associating Users to Models
 - [ ] Eg:
 ```py
@@ -133,6 +139,8 @@ def product_detail_view(request):
   - [ ] **.filter(foreign_model__foreign_attr="value")**
   - [ ] .filter(attr__iexact="VaLUe") [Ignores exact match]
 - [ ] model_object.save() can be used to save the model_objects.
+- [ ] model_object.delete()
+- [ ] .all().delete(), .filter(user__username="manas").delete()
 - [ ] To render error if id is incorrect:
 ```py
 def tweet_detail_view(request, tweet_id,  *args, **kwargs):

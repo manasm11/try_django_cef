@@ -52,6 +52,14 @@ def tweet_detail_view(request, tweet_id, *args, **kwargs):
         return Response({'message':'Tweet not found'}, status=404)
     serializer = TweetSerializer(qs.first())
     return Response(serializer.data, status=200)
+
+@api_view(['DELETE', 'POST'])
+@permission_classes([IsAuthenticated])
+def tweet_delete_view(request, tweet_id, *args, **kwargs):
+    qs = TweetModel.objects.filter(id=tweet_id)
+    if not qs.exists():
+        return Response({'message':'Tweet not found', status=404})
+    if not qs.filter
 ```
 - [ ] To change the types of Authentication that give access to views, 
   - [ ] Create REST_FRAMEWORK dictionary with 'DEFAULT_AUTHENTICATION_CLASS':['list', 'of', 'classes', 'from', 'documentation']
