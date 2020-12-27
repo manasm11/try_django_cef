@@ -61,6 +61,7 @@
   - [ ] .set  [requires a querySet]
   - [ ] .all
   - [ ] May have to pass other model as a string if it is defined later.
+- [ ] To create foreign key to same model, user 'self' as the other model.
 ##### Associating Users to Models
 - [ ] Eg:
 ```py
@@ -94,6 +95,8 @@ class TweetModel(models.Model):
   - [x] Creates new app (component in project).
   - [x] An app does one thing very good.
   - [x] You need to add it in INSTALLED_APPS list.
+- [ ] **test**
+  - [ ] To run tests in tests.py.
 - [x] **shell**
   - [x] Allows you to import models and manipulate data to database using the model.
   - [x] Eg. 
@@ -141,6 +144,7 @@ def product_detail_view(request):
 - [ ] .filter(attr1=value1, attr2=value2)
   - [ ] returns a list of objects.
   - [ ] **.filter(foreign_model__foreign_attr="value")**
+  - [ ] Every querySet (returned by filter/all functions) has .count() method.
   - [ ] .filter(attr__iexact="VaLUe") [Ignores exact match]
 - [ ] model_object.save() can be used to save the model_objects.
 - [ ] model_object.delete()
@@ -322,23 +326,27 @@ class TweetAdmin(models.ModelAdmin):
     model = Tweet
 admin.site.register(Tweet, TweetAdmin)
 ```
+## Creating user
+- [ ] get_user_model().objects.create_user(username='something', password='somethingElse')
 
-### Adding Like functionality
+
+### tests.py
 ```py
-# models.py
-class TweetLikeModel(models.Model):
-  user = models.ForeignKey(User, on_delete=CASCADE)
-  tweet = models.ForeignKey('TweetModel', on_delete=CASCADE)
-  timestamp = models.DateTimeField(auto_add_now=True)
+UserModel = get_user_model()
+from rest_framework.test import APIClient
 
-class TweetModel(models.Model):
-  likes = models.ManyToManyField(User, related_name='tweet_user', blank=True, through=TweetLike)
-  ...
+class TweetTestCase(TestCase):
+  def setUp(self):
+    self.user = UserModel.objects.create_user(username='cfe', password='somepassword')
 
+  def get_client(self):
+    client = APIClient()
+    client.login(username='username', password='password')
+    return client
 
-# admin.py
-class TweetLikeAdmin(admin.TabularInline):
-  model = TweetLike
-
-admin.site.register(TweetAdmin, TweetLikeAdmin)
+  def test_user_created(self):
+    self.assertEqual(self.user.username, "cfe")
 ```
+- [ ] assertEqual
+- [ ] assertNotEqual
+- [ ] 
