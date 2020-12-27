@@ -70,12 +70,11 @@ def tweet_delete_view(request, tweet_id, *args, **kwargs):
 ```py
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
+        # 'rest_framework.renderers.BrowsableAPIRenderer',
     ]
 }
-```
