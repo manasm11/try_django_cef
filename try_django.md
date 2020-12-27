@@ -54,18 +54,21 @@
   - [ ] First argument must be the other model.
   - [ ] on_delete=models.CASCADE is required
   - [ ] on_delete=models.SET_NULL, null=True can also be set.
-- [ ] ManyToManyField : 
+- [ ] **ManyToManyField** : 
   - [ ] through [can have an intermediate model eg TweetLike]
   - [ ] .add
   - [ ] .remove
   - [ ] .set  [requires a querySet]
+  - [ ] .all
   - [ ] May have to pass other model as a string if it is defined later.
 ##### Associating Users to Models
 - [ ] Eg:
 ```py
-from django.conf import settings
+# from django.conf import settings
 
-User = settings.AUTH_USER_MODEL
+# User = settings.AUTH_USER_MODEL
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 class TweetModel(models.Model):
   content = models.TextField(blank=True, null=True)
@@ -134,6 +137,7 @@ def product_detail_view(request):
 - [x] .get(id=[number])
   - [ ] This must return exactly one object.
 - [x] .create(**dictionary) or .create(attribute1=value1, attribute2=value2 ...)
+- [ ] .none() : To create an empty querySet.
 - [ ] .filter(attr1=value1, attr2=value2)
   - [ ] returns a list of objects.
   - [ ] **.filter(foreign_model__foreign_attr="value")**
@@ -317,4 +321,24 @@ class TweetAdmin(models.ModelAdmin):
   class Meta:
     model = Tweet
 admin.site.register(Tweet, TweetAdmin)
+```
+
+### Adding Like functionality
+```py
+# models.py
+class TweetLikeModel(models.Model):
+  user = models.ForeignKey(User, on_delete=CASCADE)
+  tweet = models.ForeignKey('TweetModel', on_delete=CASCADE)
+  timestamp = models.DateTimeField(auto_add_now=True)
+
+class TweetModel(models.Model):
+  likes = models.ManyToManyField(User, related_name='tweet_user', blank=True, through=TweetLike)
+  ...
+
+
+# admin.py
+class TweetLikeAdmin(admin.TabularInline):
+  model = TweetLike
+
+admin.site.register(TweetAdmin, TweetLikeAdmin)
 ```
