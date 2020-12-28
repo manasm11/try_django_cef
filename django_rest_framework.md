@@ -192,3 +192,34 @@ admin.site.register(TweetAdmin, TweetLikeAdmin)
 ### tests.py
 - [ ] Create a user and add a tweet in it in setup function (from models itself).
 - [ ] Refer ApiClient in django-rest-framework documentation -> testing.
+
+#### settings.py
+- [ ] To add api access to other applications, we need to configure CORS policies.
+- [ ] To install, view django-cors-header in pypi.
+- [ ] To know about configuration options, refer its github repo: https://github.com/adamchainz/django-cors-headers
+  ```py
+  CORS_ORIGIN_ALLOW_ALL = True # Any website has access to api.
+  # specific websites can be assigned as a list (http and https need to be added separately)
+  CORS_URLS_REGEX = r'^/api/.*$'
+  ```
+
+## TO enable automatic authentication in dev environment.
+- [ ] Create rest_api directory inside project (where settings.py exists).
+  - [ ] Create an __init__.py file inside that to make it a module.
+  - [ ] Create another file dev.py # Delete this file when in production.
+    - [ ] 
+    ```py
+    from rest_framework import authentication
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    class DevAuthentication(authentication.BasicAuthentication):
+      def authenticate(self, request):
+        qs = User.objects.all()
+        user = qs.order_by("?").first()
+        return (user, None) # usually it returns (user, auth)
+    ```
+- [ ] In settings.py
+  ```py
+    if DEBUG:
+      DEFAULT_AUTHENTICATION_CLASSES += ['tweetme2.rest_api.dev.DevAuthentication']
+  ```

@@ -54,13 +54,15 @@
   - [ ] First argument must be the other model.
   - [ ] on_delete=models.CASCADE is required
   - [ ] on_delete=models.SET_NULL, null=True can also be set.
-- [ ] **ManyToManyField** : 
+- [ ] **ManyToManyField**
   - [ ] through [can have an intermediate model eg TweetLike]
   - [ ] .add
   - [ ] .remove
   - [ ] .set  [requires a querySet]
   - [ ] .all
   - [ ] May have to pass other model as a string if it is defined later.
+- [ ] **OneToOneField**
+  - [ ] Allows you to use . to access related model.
 - [ ] To create foreign key to same model, user 'self' as the other model.
 ##### Associating Users to Models
 - [ ] Eg:
@@ -74,6 +76,23 @@ User = get_user_model()
 class TweetModel(models.Model):
   content = models.TextField(blank=True, null=True)
   user = models.ForeignKey(User, on_delete=models.CASCADE)
+```
+##### Signals
+- [ ] When creation, deletion of one model needs to affect another, we use signals to execute them.
+- [ ] Eg
+```py
+from django.db.models.signals import post_save #, pre_save, post_delete ...
+
+...
+
+def function_to_execute(sender, instance, created, *args, **kwargs):
+  if created:
+    # Executes only if the sender is created for first time.
+    Profile.objects.get_or_create(user=instance)
+  # Executes each time sender is saved
+  # have creation statements here if you have already created users and save each of them from admin panel. After that you can remove the statement from here.
+
+post_save.connect(function_to_execute, sender=User) # sender=SenderModel
 ```
 
 ## Commands
@@ -112,6 +131,8 @@ class TweetModel(models.Model):
 - [x] Add *args, **kwargs also as arguments in function definitions.
 - [x] Returns HttpResponse(html_string), render(request, template_name, context_dictionary), JsonResponse(data) or redirect(url)
 - [x] Convention is to pass model objects as 'object' in context, and then access the attributes from it.
+- [ ] You can use **require_login** decorator.
+- [ ] You can add redirect("login?next=/profile/update")
 - [x] To use forms, Eg:
 ```py
 from .forms import ProductForm
@@ -140,11 +161,13 @@ def product_detail_view(request):
 - [x] .get(id=[number])
   - [ ] This must return exactly one object.
 - [x] .create(**dictionary) or .create(attribute1=value1, attribute2=value2 ...)
+- [ ] .get_or_create() : Does what it says.
 - [ ] .none() : To create an empty querySet.
 - [ ] .filter(attr1=value1, attr2=value2)
   - [ ] returns a list of objects.
   - [ ] **.filter(foreign_model__foreign_attr="value")**
   - [ ] Every querySet (returned by filter/all functions) has .count() method.
+  - [ ] querySet.orderBy('?') : randomly orders the querySet.
   - [ ] .filter(attr__iexact="VaLUe") [Ignores exact match]
 - [ ] model_object.save() can be used to save the model_objects.
 - [ ] model_object.delete()
@@ -187,6 +210,9 @@ def tweet_detail_view(request, tweet_id,  *args, **kwargs):
 - [x] Best practice is to create a urls.py for each app and include it in the main project urls.py.
 - [x] Copy paste main project urls.py to create apps urls.py.
 - [x] Adding urls is given in the starter page.
+- [ ] To render a template directly, 
+  - [ ] TemplateView.as_view(template_name='[template.html]')
+- [ ] Add an optional character: re_path(s"profiles?/", some_view) # last s is optional.
 - [ ] To add dynamic urls,:
 ```py
   # In urls.py
@@ -207,6 +233,7 @@ In all other html pages,
 Then content here will be placed between body block in base.html
 {% endblock body %}
 - [x] To create components separately, create html documents separately and add {% include 'component.html' %}
+  - [ ] You can pass variables: {% include 'component.html' with form=form btn_label=btn_label %}
 - [x] Context variables can be used inside template with {{ variable }} format.
 - [x] To render a list, use for loop:
 ```html
