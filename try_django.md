@@ -75,8 +75,10 @@ User = get_user_model()
 
 class TweetModel(models.Model):
   content = models.TextField(blank=True, null=True)
-  user = models.ForeignKey(User, on_delete=models.CASCADE)
+  user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tweets")
 ```
+ - [ ] To access tweets from user_obj, `user_obj.tweetmodel_set.all()` or `user_obj.tweets.all()` (if related_name is provided).
+ - [ ] Similarly to access TweetLikes by a user, `user_obj.tweetlike_set.all()`
 ##### Signals
 - [ ] When creation, deletion of one model needs to affect another, we use signals to execute them.
 - [ ] Eg
@@ -113,9 +115,11 @@ post_save.connect(function_to_execute, sender=User) # sender=SenderModel
 - [x] **startapp appname**
   - [x] Creates new app (component in project).
   - [x] An app does one thing very good.
+  - [x] An app does one thing very good.
   - [x] You need to add it in INSTALLED_APPS list.
 - [ ] **test**
   - [ ] To run tests in tests.py.
+  - [ ] test [app_name] can be used to test a specific app.
 - [x] **shell**
   - [x] Allows you to import models and manipulate data to database using the model.
   - [x] Eg. 
@@ -166,8 +170,16 @@ def product_detail_view(request):
 - [ ] .filter(attr1=value1, attr2=value2)
   - [ ] returns a list of objects.
   - [ ] **.filter(foreign_model__foreign_attr="value")**
+  - [ ] **.filter(attr__in=[list, of, values])
+  - [ ] To filter with **or** condition:
+  ```py
+  from django.db.models import Q
+  qs.filter(Q(attr1="value1") | Q(attr2="value2"))
+  ```
   - [ ] Every querySet (returned by filter/all functions) has .count() method.
   - [ ] querySet.orderBy('?') : randomly orders the querySet.
+  - [ ] querySet.values_list("list", "of", "values", "to", "return", flat=True)
+  - [ ] querySet.distinct() # Useful when using Q.
   - [ ] .filter(attr__iexact="VaLUe") [Ignores exact match]
 - [ ] model_object.save() can be used to save the model_objects.
 - [ ] model_object.delete()
@@ -358,6 +370,7 @@ admin.site.register(Tweet, TweetAdmin)
 
 
 ### tests.py
+- [ ] It is a good practice to have all declarations above and have all assert statements at the end of test_ function.
 ```py
 UserModel = get_user_model()
 from rest_framework.test import APIClient
@@ -376,4 +389,7 @@ class TweetTestCase(TestCase):
 ```
 - [ ] assertEqual
 - [ ] assertNotEqual
-- [ ] 
+
+
+### Creating custom ModelManagers
+- [ ]
