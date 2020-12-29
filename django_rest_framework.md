@@ -74,6 +74,7 @@ def tweet_delete_view(request, tweet_id, *args, **kwargs):
 - [ ] To change the types of Authentication that give access to views, 
   - [ ] Create REST_FRAMEWORK dictionary with 'DEFAULT_AUTHENTICATION_CLASS':['list', 'of', 'classes', 'from', 'documentation']
   - [ ] Add permission_classes decorator and pass the list of permission classes from from rest_framework.permissions.
+- [ ] To pass data from views to serializer, pass it as context in the constructor: `TweetSerializer(instance=obj, context={"request":request})` and access in class using self.context.
 
 #### settings.py
 - [ ] add to INSTALLED_APPS : 'rest_framework'
@@ -223,3 +224,59 @@ admin.site.register(TweetAdmin, TweetLikeAdmin)
     if DEBUG:
       DEFAULT_AUTHENTICATION_CLASSES += ['tweetme2.rest_api.dev.DevAuthentication']
   ```
+
+## Pagination
+- [ ] Look at django-rest-framework pagination.
+- [ ] There are many types of inbuilt pagination-classes and you can create your own custom ones.
+- [ ] Eg:
+```py
+# views.py
+from rest_framework.pagination import PageNumberPagination
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def tweet_feed_view(request, *args, **kwargs):
+  paginator = PageNumberPagination()
+  paginator.page_size = 20
+  user = request.user
+  qs = Tweet.objects.feed(user)
+  paginated_qs = paginator.paginate(qs, request)
+  serializer = TweetSerializer(paginated_qs, many=True)
+  return paginator.get_paginated_response(serializer.data)
+```
+
+## Custom Serializers
+```py
+class ProfileSerializer(serializers.ModelSerializer):
+  first_name = serializers.SerializerMethodField(read_only=True)
+  last_name = serializers.SerializerMethodField(read_only=True)
+  username = serializers.SerializerMethodField(read_only=True)
+  follower_count = serializers.SerializerMethodField(read_only=True)
+  following_count = serializers.SerializerMethodField(read_only=True)
+
+  class Meta:
+    model = Profile
+    fields = [
+      'first_name',
+      'last_name',
+      'follower_count',
+      'following_count',
+      'username',
+      'id',
+    ]
+
+    def get_first_name(self, obj):
+      return obj.user.first_name
+
+    def get_last_name(self, obj):
+      return obj.user.last_name
+
+    def get_username(self, obj):
+      return obj.user.username
+
+    def get_following_count(self, obj):
+      return obj.user.following.count()
+
+    def get_followers_count(self, obj):
+      return obj.user.followers.count()
+
+```

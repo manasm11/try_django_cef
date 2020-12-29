@@ -392,4 +392,25 @@ class TweetTestCase(TestCase):
 
 
 ### Creating custom ModelManagers
-- [ ]
+```py
+# tweets -> models.py
+class TweetQuerySet(models.QuerySet):
+  def feed(self, argument):
+    return self.filter(any complex query with argument)
+
+class TweetManager(models.Manager):
+  def get_queryset(self, *args, **kwargs):
+    return TweetQuerySet(self.model, using=self._db)
+  
+  def feed(self, argument):
+    return self.get_queryset().feed(argument) # this is to avoid .all() method call in between.
+
+class TweetModel(models.Model):
+  ...
+  objects = TweetManage()
+
+# to access,
+TweetModel.objects.all().feed(user)
+# or if feed method is also defined in TweetManager
+TweetModel.objects.feed(user)
+```
