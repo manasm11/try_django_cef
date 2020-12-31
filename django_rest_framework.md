@@ -3,16 +3,20 @@
 - [ ] create serializers.py:
 
 #### serializers.py
+- [ ] To use all fields, 
+  - [ ] fields = '__all__'
+- [ ] likes = serializers.RelatedField(many=True, read_only=True) will return str(likes): checkout: https://stackoverflow.com/questions/24346701/django-rest-framework-primarykeyrelatedfield
 ```py
 # serializers.py
 
 from rest_framework import serializers
 from .models import TweetModel
 
-class TweetSerializer(serializers.ModelSerializer):
+class TweetSerializer(serializers.ModelSerializer): # HyperlinkedModelSerializer allows to add a 'url' field which allows to add a link to the data.
     class Meta:
         model = TweetModel
         fields = ['id', 'content', 'likes']
+        read_only_fields = ['id']
     
     def get_likes(self, obj):
         return obj.likes.count()
@@ -75,6 +79,54 @@ def tweet_delete_view(request, tweet_id, *args, **kwargs):
   - [ ] Create REST_FRAMEWORK dictionary with 'DEFAULT_AUTHENTICATION_CLASS':['list', 'of', 'classes', 'from', 'documentation']
   - [ ] Add permission_classes decorator and pass the list of permission classes from from rest_framework.permissions.
 - [ ] To pass data from views to serializer, pass it as context in the constructor: `TweetSerializer(instance=obj, context={"request":request})` and access in class using self.context.
+
+#### Class Views
+```py
+from rest_framework import generics, permissions
+
+class RecipeCreateView(generics.CreateAPIView):
+  queryset = Recipe.objects.all()
+  serializer_class = RecipeSerializer
+  permission_classes = [
+    permissions.IsAuthenticated,
+  ]
+
+  def perform_create(self, serializer):
+    serializer.save(author=self.request.user)
+    serializer_class = RecipeSerializer
+    permission_classes = [permissions.AllowAny]
+  
+  # THERE IS ListAPIView ALSO !!!
+
+class IngredientCreateView(generics.ListCreateAPIView):
+  queryset = Ingredient.objects.all()
+  serializer_class = Ingredient
+
+class CreateUpvoteView(generics.CreateAPIView):
+  serializer_class = UpvoteSerializer
+  permission_classes = [permissions.IsAuthenticated]
+
+  def get_queryset(self):
+    user = self.request.user
+    recipe = Recipe.objects.filter(pk=self.kwargs['pk'])
+    return Upvote.objects.filter(user=user, recipe=recipe)
+  
+  def perform_create(self, serializer):
+    if self.get_queryset().exists():
+      raise ValidationError('You have already voted on the recipe.')
+    user = self.request.user
+    recipe = Recipe.objects.filter(pk=self.kwargs['pk'])
+    serializer.save(user=user, recipe=recipe)
+
+```
+
+```py
+from rest_framework import viewsets
+class CourseView(viewsets.ModelViewSet):
+  queryset = Course.objects.all()
+  serializer_class = CourseSerializer
+```
+
 
 #### settings.py
 - [ ] add to INSTALLED_APPS : 'rest_framework'
@@ -194,6 +246,16 @@ admin.site.register(TweetAdmin, TweetLikeAdmin)
 - [ ] Create a user and add a tweet in it in setup function (from models itself).
 - [ ] Refer ApiClient in django-rest-framework documentation -> testing.
 
+### urls.py
+```py
+from rest_framework import routers
+router.register('courses', CourseView) # CourseView imported from .views
+
+urlpatterns = [
+  path('', include(router.urls)),
+]
+```
+
 #### settings.py
 - [ ] To add api access to other applications, we need to configure CORS policies.
 - [ ] To install, view django-cors-header in pypi.
@@ -280,3 +342,6 @@ class ProfileSerializer(serializers.ModelSerializer):
       return obj.user.followers.count()
 
 ```
+
+### Some Notes
+- [ ] Always use request.data for a post request.

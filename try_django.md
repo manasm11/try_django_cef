@@ -70,8 +70,9 @@
 # from django.conf import settings
 
 # User = settings.AUTH_USER_MODEL
-from django.contrib.auth import get_user_model
-User = get_user_model()
+# from django.contrib.auth import get_user_model
+# User = get_user_model()
+from django.contrib.auth.models import User
 
 class TweetModel(models.Model):
   content = models.TextField(blank=True, null=True)
@@ -179,6 +180,8 @@ def product_detail_view(request):
   - [ ] Every querySet (returned by filter/all functions) has .count() method.
   - [ ] querySet.orderBy('?') : randomly orders the querySet.
   - [ ] querySet.values_list("list", "of", "values", "to", "return", flat=True)
+  - [ ] querySet.aggregate(django.db.models.Sum('field_name'))
+  - [ ] querySet.annotate    // Look in docs it's better than aggregate.
   - [ ] querySet.distinct() # Useful when using Q.
   - [ ] .filter(attr__iexact="VaLUe") [Ignores exact match]
 - [ ] model_object.save() can be used to save the model_objects.
@@ -414,3 +417,16 @@ TweetModel.objects.all().feed(user)
 # or if feed method is also defined in TweetManager
 TweetModel.objects.feed(user)
 ```
+
+### Using Images in database (in development server)
+##### models.py
+- [ ] add field models.ImageField(upload_to='images/')
+
+##### settings.py
+- [ ] MEDIA_URL = '/media/'
+- [ ] MEDIA_ROOT = BASE_DIR / 'media'  # directory where media files will be stored.
+
+##### urls.py
+- [ ] from django.conf import settings
+- [ ] from django.conf.urls.static import static
+- [ ] urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
