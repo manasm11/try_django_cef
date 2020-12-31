@@ -6,6 +6,7 @@
 - [ ] To use all fields, 
   - [ ] fields = '__all__'
 - [ ] likes = serializers.RelatedField(many=True, read_only=True) will return str(likes): checkout: https://stackoverflow.com/questions/24346701/django-rest-framework-primarykeyrelatedfield
+- [ ] set an attribute to the serializer, if you want to expand it.
 ```py
 # serializers.py
 
@@ -97,6 +98,8 @@ class RecipeCreateView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
   
   # THERE IS ListAPIView ALSO !!!
+  # THERE IS RetrieveAPIView ALSO !!!
+  # THERE IS RetrieveUpdateDeleteAPIView ALSO !!!
 
 class IngredientCreateView(generics.ListCreateAPIView):
   queryset = Ingredient.objects.all()
@@ -115,8 +118,20 @@ class CreateUpvoteView(generics.CreateAPIView):
     if self.get_queryset().exists():
       raise ValidationError('You have already voted on the recipe.')
     user = self.request.user
-    recipe = Recipe.objects.filter(pk=self.kwargs['pk'])
+    recipe = Recipe.objects.filter(pk=self.kwargs['pk']) # this 'pk' will be passed in url.
     serializer.save(user=user, recipe=recipe)
+
+class RecipeUpdateView(generics.RetrieveUpdateDeleteView):
+  queryset = Recipe.objects.all()
+  serializer_class = RecipeSerializer
+  permission_classes = [permissions.IsAuthenticated]
+
+  def delete(self, request, *args, **kwargs):
+    recipe = Recipe.objects.filter(author=self.request.user, pk=kwargs['pk'])
+    if recipe.exists():
+      return self.destroy(request, *args, **kwargs)
+    raise ValidationError("This isn't your recipe")
+    
 
 ```
 
@@ -340,6 +355,72 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def get_followers_count(self, obj):
       return obj.user.followers.count()
+
+```
+
+## REST Authentication
+#### serializers.py
+```py
+class UserRegistrationSerializer(serializers.ModelSerializer):
+  password = serializers.CharField(style={'input type':'password'}, write_only=True)
+  class Meta:
+    model = User
+    fields = ['username', 'email', 'password']
+  
+  def create(self, validated_data):
+    user = User.objects.create(username=validated_data['username'], email=validated_data['email'])
+    user.set_password(validated_data['password'])
+    user.save()
+    return user
+
+# Then create CreateAPIView.
+```
+
+### Token based authentication
+- [ ] User state is stored on client-side rather server side. It is much more scalable.
+##### settings.py
+```py
+# In INSTALLED_APPS, add 
+# 'rest_framework.authtoken'
+
+REST_FRAMEWORK = {
+  'DEFAULT_AUTHENTICATION_CLASSES': [
+    'rest_framework.authentication.TokenAuthentication'
+  ]
+}
+```
+##### models.py
+```py
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+
+...
+
+@receiver(post_save, sender=User)
+def create_token(sender, instance=None, created=False, **kwargs):
+  if created:
+    Token.objects.create(user=instance)
+
+```
+- [ ] To create token for the admin user, `./manage.py drf_create_token [username]`
+
+##### views.py
+```py
+class UserRegistrationView(generics.CreateAPIView):
+  queryset = User.objects.all()
+  serializer_class = UserRegistrationSerializer
+  permission_classes = [permissions.AllowAny]
+
+  def post(self, request, *args, **kwargs):
+    serializer = UserRegistrationSerializer(data=request.data)
+    if serializer.is_valid():
+      user = serializer.save()
+      token = Token.objects.get(user=user).key
+      data = {'token':token}
+    else:
+      data = serializers.errors
+    return Response(data=data, status=201)
 
 ```
 
