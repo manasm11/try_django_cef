@@ -430,3 +430,11 @@ TweetModel.objects.feed(user)
 - [ ] from django.conf import settings
 - [ ] from django.conf.urls.static import static
 - [ ] urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+### Adding MySQL to django
+- [ ] To install, refer https://www.youtube.com/watch?v=TG6WAnyeDRw
+- [ ] To change password properly, refer https://dailydoseoftech.com/solved-error-1698-28000-access-denied-for-user-rootlocalhost/
+
+### Adding PostgreSQL to django
+- [ ] Refer : https://djangocentral.com/using-postgresql-with-django/
+- [ ] If unable to pip install psycopg2, try pip install psycopg2-binary

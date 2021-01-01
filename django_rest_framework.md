@@ -407,6 +407,9 @@ def create_token(sender, instance=None, created=False, **kwargs):
 
 ##### views.py
 ```py
+from rest_framework.authtoken.serializers import AuthTokenSerializer
+from rest_framework.authtoken.views import ObtainAuthToken
+
 class UserRegistrationView(generics.CreateAPIView):
   queryset = User.objects.all()
   serializer_class = UserRegistrationSerializer
@@ -421,8 +424,21 @@ class UserRegistrationView(generics.CreateAPIView):
     else:
       data = serializers.errors
     return Response(data=data, status=201)
+  
+class UserLoginView(generics.CreateAPIView):
+  serializer_class = AuthTokenSerializer
+
+  def create(self, request):
+    return ObtainAuthToken().post(request)
 
 ```
+- [ ] To Authenticate, setRequestHeader('Authentication', 'Token [User's token]')
 
 ### Some Notes
 - [ ] Always use request.data for a post request.
+
+### HTTP Response Codes
+![picture 1](images/cbcb9d86323b3495a344e275a8f1fa6096d9b87e70b66b02c4f59cefd404662a.png)  
+![picture 2](images/c2e6acf8883afbade141614ac5763890a0d006fc0782e376a9d14eaec8814253.png)  
+![picture 3](images/73f6fa3f2f5a93aa344521163b2e6c1b1f4596d2e9996969c45e0b831a64f634.png)  
+![picture 4](images/9f20a46ca0f024eab200a68fac0ecc87d2ef22872af7257f92b02e24a673d2c2.png)  
