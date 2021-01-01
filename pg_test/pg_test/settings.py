@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'evh!@yh)c-2kkv@=^efjcm0%gf@2syi0^=!e6+)o9(=^-g$u*d'
+SECRET_KEY = '*8=gg5+fi!-n%ng3#1i9(6c(b7oxtz6)6s9%0#05dzf*63x467'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -25,7 +25,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'test3.apps.Test3Config',
+
+    # third-party
+    'rest_framework',
+    'rest_framework.authtoken',
+
+    # local
+    'names.apps.NamesConfig',
 ]
 
 MIDDLEWARE = [
@@ -38,7 +44,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'trydjango3.urls'
+ROOT_URLCONF = 'pg_test.urls'
 
 TEMPLATES = [
     {
@@ -56,7 +62,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'trydjango3.wsgi.application'
+WSGI_APPLICATION = 'pg_test.wsgi.application'
 
 
 # Database
@@ -65,8 +71,8 @@ WSGI_APPLICATION = 'trydjango3.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'trydjango3',
-        'USER': 'trydjango3',
+        'NAME': 'test_pg',
+        'USER': 'test_pg',
         'PASSWORD': 'testing321',
         'HOST': 'localhost',
         'PORT': '',
@@ -111,3 +117,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
