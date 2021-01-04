@@ -36,6 +36,17 @@ class TweetSerializer(serializers.ModelSerializer): # HyperlinkedModelSerializer
 
 
 #### views.py
+- [ ] List of permissions
+  - [ ] AnonymousUser (default)
+  - [ ] AllowAny
+  - [ ] IsAuthenticated
+  - [ ] IsAdminUser
+  - [ ] IsAuthenticatedOrReadOnly
+>DjangoModelPermissions : Permissions set by adding users to groups and adding individual permissions.
+  - [ ] DjangoModelPermissions
+  - [ ] DjangoModelPermissionsOrAnonReadOnly
+  - [ ] 
+>Permissions can be added to class views by adding a attribute : permission_classes = [IsAdminUser]  # This is an example.
 ```py
 # views.py
 from rest_framework.response import Response
@@ -82,6 +93,29 @@ def tweet_delete_view(request, tweet_id, *args, **kwargs):
 - [ ] To pass data from views to serializer, pass it as context in the constructor: `TweetSerializer(instance=obj, context={"request":request})` and access in class using self.context.
 
 #### Class Views
+- [ ] List of generic APIViews in rest_framework
+  - [ ] CreateAPIView :
+    - [ ] POST endpoint.
+  - [ ] ListAPIView : 
+    - [ ] GET endpoints for list of model instances.
+  - [ ] RetrieveAPIView : 
+    - [ ] GET endpoint for single model instance.
+  - [ ] DestroyAPIView : 
+    - [ ] DELETE endpoint for single instance.
+  - [ ] UpdateAPIView : 
+    - [ ] PUT-PATCH endpoint for single instance.
+  - [ ] ListCreateAPIView : 
+    - [ ] PUT-PATCH endpoint for list of model instances.
+  - [ ] RetrieveUpdateAPIView : 
+    - [ ] GET endpoint to view a model instance.
+    - [ ] PUT-PATCH endpoint to update a model instance.
+  - [ ] RetrieveDestroyAPIView : 
+    - [ ] GET endpoint for single model instance.
+    - [ ] DELETE endpoint for single model instance.
+  - [ ] RetrieveUpdateDestroyAPIView :
+    - [ ] GET endpoint for single model instance.
+    - [ ] POST endpoint for single model instance.
+    - [ ] DELETE endpoint for single model instance.
 ```py
 from rest_framework import generics, permissions
 
@@ -260,8 +294,63 @@ admin.site.register(TweetAdmin, TweetLikeAdmin)
 ### tests.py
 - [ ] Create a user and add a tweet in it in setup function (from models itself).
 - [ ] Refer ApiClient in django-rest-framework documentation -> testing.
+- [ ] Eg:
+```py
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
+from blog.models import Post, Category
+from django.contrib.auth.models import User
+
+# assuming in urls.py, app_name='blog_api'
+class PostTests(APITestCase):
+  def test_view_posts(self):
+    url = reverse('blog_api:listcreate')
+    response = self.client.get(url, format='json')
+    sefl.assertEqual(response.status_code, status.HTTP_200_OK)
+  
+  def create_post(self):
+    self.test_category = Category.objects.create(name='django')
+    self.testuser1 = User.objects.create_user(username='test_user1', password='123456789')
+
+    data = {
+      'title':'new',
+      'author':1,
+      'exerpt':'new',
+      'content':'new',
+    }
+    url = reverse('blog_api:listcreate')
+    response = self.client.post(url, data, format='json')
+    self.assertEqual(response.status_code, 201)
+
+```
 
 ### urls.py
+- [ ] Adding swagger:
+  - [ ] pip install drf-yasg.
+```py
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="APIs by Manas Mishra 😎",
+      default_version='OSSUM',
+      description="A simple api to add, remove and update Questions.",
+    #   terms_of_service="https://www.google.com/policies/terms/",
+    #   contact=openapi.Contact(email="Manas Mishra 😎"),
+    #   license=openapi.License(name="BSD License"),
+   ),
+   public=True,
+   permission_classes=(permissions.AllowAny,),
+)
+
+urlpatterns = [
+    path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+]
+
+```
+- [ ] Another way to add api endpoints.
 ```py
 from rest_framework import routers
 router.register('courses', CourseView) # CourseView imported from .views
@@ -434,6 +523,20 @@ class UserLoginView(generics.CreateAPIView):
 ```
 - [ ] To Authenticate, setRequestHeader('Authentication', 'Token [User's token]')
 
+### Creating Custom Permissions
+- [ ] Eg of permission of person who created a post can only edit it.
+- [ ] rest_framework.permissions.SAFE_METHODS is list of 'GET', 'HEAD' and 'OPTION' methods.
+```py
+from rest_framework import permissions
+class PostUserWritePermission(permissions.BasePermission):
+  message = 'Editing posts is restricted to the author only.'
+
+  def has_object_permission(self, request, view, obj):
+    if request.method in permissions.SAFE_METHODS:
+      return true
+    return request.user == obj.author
+```
+
 ### Some Notes
 - [ ] Always use request.data for a post request.
 
@@ -442,3 +545,11 @@ class UserLoginView(generics.CreateAPIView):
 ![picture 2](images/c2e6acf8883afbade141614ac5763890a0d006fc0782e376a9d14eaec8814253.png)  
 ![picture 3](images/73f6fa3f2f5a93aa344521163b2e6c1b1f4596d2e9996969c45e0b831a64f634.png)  
 ![picture 4](images/9f20a46ca0f024eab200a68fac0ecc87d2ef22872af7257f92b02e24a673d2c2.png)  
+
+
+### REST(ful) meaning
+Standards for and api.
+- [ ] Base url : http://something.com/api/
+- [ ] HTTP Methods : GET, POST, PUT, PATCH, DELETE
+- [ ] Is stateless, like http ???
+- [ ] Includes media type like JSON.

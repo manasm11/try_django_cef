@@ -41,6 +41,7 @@
 >When adding new field, either do null=True or provide some default value(Eg. default="default value").
 - [x] **CharField**
   - [x] Must have max_length=120 argument.
+  - [ ] Can have choices=[('list','list'), ('of', 'of'), ('choices', 'choices'), ('tuples', 'tuples')]
 - [x] **TextField**
   - [x] blank=False : Makes field as required while taking input.
   - [x] null=True : Makes field nullable in database.
@@ -50,9 +51,16 @@
 - [x] **BooleanField**
 - [ ] **FileField**
   - [ ] upload_to="images/"
+- [ ] **SlugField** : Gives a unique url.
+  - [ ] Must have max_length.
+  - [ ] Can have unique_for_data='published'  ???
+- [ ] **DateTimeField** 
+  - [ ] default=django.utils.timezone.now()
 - [ ] **ForeignKey**
+  - [ ] related_name='something' : Allows to refer to this object from other one.
   - [ ] First argument must be the other model.
   - [ ] on_delete=models.CASCADE is required
+  - [ ] on_delete=models.PROTECT will make sure you don't delete the other Model unless all of these models are deleted. (I am not very good with words.)
   - [ ] on_delete=models.SET_NULL, null=True can also be set.
 - [ ] **ManyToManyField**
   - [ ] through [can have an intermediate model eg TweetLike]
@@ -104,6 +112,8 @@ post_save.connect(function_to_execute, sender=User) # sender=SenderModel
   - [x] Starts a development server.
   - [x] You can allow the server to keep running and do all changes in another terminal, including migrations.
 - [x] **makemigrations** and **migrate**
+  - [ ] --dry-run : doesn't applies updates.
+  - [ ] --verbosity 3 : Gives out more info while adding changes.
   - [x] Updates database.
   - [x] Both commands are run together in sequence.
   - [x] Run these upon any change in models.py.
@@ -228,6 +238,7 @@ def tweet_detail_view(request, tweet_id,  *args, **kwargs):
 - [ ] To render a template directly, 
   - [ ] TemplateView.as_view(template_name='[template.html]')
 - [ ] Add an optional character: re_path(s"profiles?/", some_view) # last s is optional.
+- [ ] We can add namespace='something' as argument to path function.
 - [ ] To add dynamic urls,:
 ```py
   # In urls.py
@@ -358,6 +369,14 @@ def clean_title(self, *args, **kwargs):
 ### admin.py
 - [ ] Register models to be viewed from admin page.
   - [ ] admin.site.register(ModelName)
+- [ ] Eg :
+```py
+@admin.register(models.Post)
+class AuthorAdmin(admin.ModelAdmin):
+  list_display = ('title', 'id', 'status', 'slug', 'author')
+  prepopulated_fields = {'slug':(title,), }
+```
+- [ ] To search for options, search 'ModelAdmin options' in django admin site docs. 
 - [ ] Search by fields and show fields.
   - [ ] Eg:
 ```py
@@ -379,6 +398,10 @@ UserModel = get_user_model()
 from rest_framework.test import APIClient
 
 class TweetTestCase(TestCase):
+  @classmethod
+  class setUpTestData(cls): # this will be called once
+    test_category = Category.objects.create(name='django')
+
   def setUp(self):
     self.user = UserModel.objects.create_user(username='cfe', password='somepassword')
 
@@ -393,8 +416,20 @@ class TweetTestCase(TestCase):
 - [ ] assertEqual
 - [ ] assertNotEqual
 
+#### coverage
+- [ ] pip install coverage
+- [ ] coverage run --omit='*/dj2.2/' manage.py test
+- [ ] coverage html
+  - [ ] This creates a folder with html files that tell about the tests that need to be created.
 
 ### Creating custom ModelManagers
+```py
+class Post(models.Model):
+  class PostObjects(models.Manager):
+    def get_queryset(self):
+      return super().get_queryset().filter(status='published')
+```
+
 ```py
 # tweets -> models.py
 class TweetQuerySet(models.QuerySet):
@@ -438,3 +473,15 @@ TweetModel.objects.feed(user)
 ### Adding PostgreSQL to django
 - [ ] Refer : https://djangocentral.com/using-postgresql-with-django/
 - [ ] If unable to pip install psycopg2, try pip install psycopg2-binary
+
+### Updating Permissions
+3 ways where permissions can be applied
+- [ ] Project Level Permissions
+```py
+# settings.py
+REST_FRAMEWORK = {
+  'DEFAULT_PERMISSION_CLASSES': [
+    'rest_framework.permissions.AllowAny',
+  ]
+}
+```
