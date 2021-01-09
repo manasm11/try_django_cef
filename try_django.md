@@ -485,3 +485,34 @@ REST_FRAMEWORK = {
   ]
 }
 ```
+
+## Testing
+- [ ] setUp class functions.
+```py
+from django.test import TestCase
+from django.contrib.auth.models import User
+from blog.models import Post, Category
+
+class Test_Case_Post(TestCase):
+  @classmethod
+  def setUpTestData(cls):
+    test_category = Category.objects.create(name='django')
+    testuser1 = User.objects.create_user(
+      username='test_user1',
+      password='123456789',
+      )
+    test_post = Post.objects.create(
+      category_id=1,
+      title='Post title',
+      author_id=1,
+      status='published',
+      )
+```
+- [ ] Testing models created:
+```py
+def test_blog_content(self):
+  # Extract all attributes of the created model, then test that they are what they supposed to be, mostly using self.assertEqual.
+```
+
+## Setup Google Authentication
+- [ ] https://www.youtube.com/watch?v=56w8p0goIfs

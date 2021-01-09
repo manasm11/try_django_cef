@@ -448,6 +448,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 ```
 
 ## REST Authentication
+- [ ] In urls.py : path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+- [ ] Another method:
 #### serializers.py
 ```py
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -553,3 +555,24 @@ Standards for and api.
 - [ ] HTTP Methods : GET, POST, PUT, PATCH, DELETE
 - [ ] Is stateless, like http ???
 - [ ] Includes media type like JSON.
+
+## Testing
+- [ ] Refer coverage in the try_django.md
+- [ ] Setting up
+```py
+from rest_framework.test import APITestCase
+from django.urls import reverse
+
+from django.contrib.auth.models import User
+from blog.models import Post, Category
+
+class PostTests(APITestCase):
+  def test_view_posts(self):
+    url = reverse('blog_api:listcreate') # blog_api must be defined as app_name in urls.py
+    response = self.client.get(url, format='json')
+    self.assertEqual(response.status_code, 200)
+    
+```
+
+## Setup Google Authentication
+- [ ] https://medium.com/@gerrysabar/implementing-google-login-with-jwt-in-django-for-restful-api-authentication-eaa92e50522d
