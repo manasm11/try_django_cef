@@ -16,7 +16,8 @@ class UserProfileManager(BaseUserManager):
         if not password: raise ValueError('Superuser must have password')
         if not name: raise ValueError('Superuser must have name')
         if not email: raise ValueError('Superuser must have email')
-        user = self.create_user(email, name, password)
+        user = self.create_user(email, name)
+        user.set_password(password)
         user.is_superuser = True
         user.is_staff = True
         user.save(using=self._db)

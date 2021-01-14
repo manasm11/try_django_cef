@@ -18,7 +18,35 @@ class TweetSerializer(serializers.ModelSerializer): # HyperlinkedModelSerializer
         model = TweetModel
         fields = ['id', 'content', 'likes']
         read_only_fields = ['id']
-    
+
+        # THIS CAN ALSO BE USED TO CONFIGURE FIELDS.
+        # extra_kwargs = {
+        #   'password':{
+        #     'write_only': True,
+        #     'style': {'input_type': 'password'}
+        #   }
+        # }
+
+    # Defines how to create the object
+    def create(self, validated_data):
+        """Create and return a new user"""
+        user = models.UserProfile.objects.create_user(
+            email=validated_data['email'],
+            name=validated_data['name'],
+            password=validated_data['password']
+        )
+
+        return user
+
+        
+    def update(self, instance, validated_data):
+        """Handle updating user account"""
+        if 'password' in validated_data:
+            password = validated_data.pop('password')
+            instance.set_password(password)
+ 
+        return super().update(instance, validated_data)
+
     def get_likes(self, obj):
         return obj.likes.count()
 
@@ -650,4 +678,44 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 # settings.py
 AUTH_USER_MODEL = 'profiles.UserProfile'
 
+```
+
+# ViewSets
+- [ ] Standard ViewSet
+```py
+# views.py
+from serializers import viewsets
+
+class HelloViewSet(viewsets.ViewSet):
+
+  def list(self, request):
+    """List items"""
+    return Response({'list':'items'})
+
+  def create(self, request):
+    """List items"""
+    return Response({'create':'item'})
+
+  def retrieve(self, request, pk=None):
+    """List items"""
+    return Response({'retrieve':'item'})
+
+  def update(self, request, pk=None):
+    """List items"""
+    return Response({'update':'item'})
+
+  def partial_update(self, request, pk=None):
+    """List items"""
+    return Response({'partial_update':'item'})
+
+  def destroy(self, request, pk=None):
+    """Delete items"""
+    return Response({'destroy':'item'})
+
+# urls.py
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register('hello-viewset', views.HelloViewSet, base_name='hello-viewset') # No need to add an ending slash.
+urlpatterns+=[path('', include(router.urls))]
 ```
