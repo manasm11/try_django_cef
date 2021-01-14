@@ -516,3 +516,16 @@ def test_blog_content(self):
 
 ## Setup Google Authentication
 - [ ] https://www.youtube.com/watch?v=56w8p0goIfs
+```py
+SOCIALACCOUNT_PROVIDER = {
+    'google':{
+        'SCOPE':[
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS':{
+            'access_type':'online',
+        }
+    }
+}
+```

@@ -93,6 +93,25 @@ def tweet_delete_view(request, tweet_id, *args, **kwargs):
 - [ ] To pass data from views to serializer, pass it as context in the constructor: `TweetSerializer(instance=obj, context={"request":request})` and access in class using self.context.
 
 #### Class Views
+- [ ] Basic APIView
+```py
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+class HelloAPIView(APIView):
+  def get(self, request, format=None):
+    return Response({"detail":"HEALLO !!!"})
+  def post(self, request, format=None):
+    return Response({"detail":"HEALLO !!!"})
+  def put(self, request, format=None):
+    return Response({"detail":"HEALLO !!!"})
+  def patch(self, request, format=None):
+    return Response({"detail":"HEALLO !!!"})
+  def delete(self, request, format=None):
+    return Response({"detail":"HEALLO !!!"})
+
+
+```
 - [ ] List of generic APIViews in rest_framework
   - [ ] CreateAPIView :
     - [ ] POST endpoint.
@@ -576,3 +595,59 @@ class PostTests(APITestCase):
 
 ## Setup Google Authentication
 - [ ] https://medium.com/@gerrysabar/implementing-google-login-with-jwt-in-django-for-restful-api-authentication-eaa92e50522d
+
+
+# Custom user
+```py
+# models.py
+
+from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+
+
+class UserProfileManager(BaseUserManager):
+  def create_user(self, email, name, password=None):
+    if not email: raise ValueError('User Must have an email.')
+    email = self.normalize_email(email) # converts later part of email to lowercase
+    user = self.model(email=email, name=name)
+  
+    user.set_password(password)
+    user.save(using=self._db) # using attribute specifies the database where it will be stored.
+
+    return user
+
+  def create_super_user(self, email, name, password):
+    user = self.create_user(email, name, password)
+
+    user.is_superuser = True # this attribute is defined in PermissionsMixin
+    user.is_staff = True
+    user.save(using=self._db)
+
+    return user
+
+
+class UserProfile(AbstractBaseUser, PermissionsMixin):
+  """Custom User model""" 
+  email = models.EmailField(max_length=255, unique=True)
+  name = models.CharField(max_length=255)
+  is_active = models.BooleanField(default=True)
+  is_staff = models.BooleanField(default=False)
+
+  objects = UserProfileManager()
+
+  USERNAME_FIELD = 'email'
+  REQUIRED_FIELDS = ['name']
+
+  def get_full_name(self):
+    return self.name
+
+  def get_short_name(self):
+    return self.name
+  
+  def __str__(self):
+    return self.email
+
+# settings.py
+AUTH_USER_MODEL = 'profiles.UserProfile'
+
+```
