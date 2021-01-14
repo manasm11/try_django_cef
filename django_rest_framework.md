@@ -38,7 +38,7 @@ class TweetSerializer(serializers.ModelSerializer): # HyperlinkedModelSerializer
 
         return user
 
-        
+
     def update(self, instance, validated_data):
         """Handle updating user account"""
         if 'password' in validated_data:
@@ -718,4 +718,35 @@ from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 router.register('hello-viewset', views.HelloViewSet, base_name='hello-viewset') # No need to add an ending slash.
 urlpatterns+=[path('', include(router.urls))]
+```
+- [ ] ModelViewSet
+```py
+from rest_framework.authentication import TokenAuthentication
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+  serializer_class = serializers.UserProfileSerializer
+  queryset = models.UserProfile.objects.all()
+  authentication_classes = [TokenAuthentication]
+  permission_classes = [permissions.UpdateOwnProfile]
+
+  # ADDING SEARCH CAPABILITY
+  # refer: https://www.django-rest-framework.org/api-guide/filtering/#searchfilter
+  filter_backends = (filters.SearchFilter, filters.OrderingFilter,)
+  search_fields = ('email', 'name',)
+  ordering_fields = ('id', 'name', 'email',)
+
+```
+
+# permissions.py
+```py
+from rest_framework import permissions
+
+class UpdateOwnProfile(permissions.BasePermission):
+  """Allow users to update only their own profile"""
+  def has_object_permission(self, request, view, obj):
+    """Check user is trying to edit their own profile"""
+    if request.method in permissions.SAFE_METHODS:
+      return True
+    return obj.id == request.user.id
+
 ```
