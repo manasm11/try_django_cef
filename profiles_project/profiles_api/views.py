@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponse
 from rest_framework import viewsets, authentication, filters
+from django_filters.rest_framework import DjangoFilterBackend
 # from .models import UserProfile
 # from .serializers import UserProfileSerializer
 from . import (
@@ -18,6 +19,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [permissions.UserUpdateTheirProfile]
 
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['email', 'name']
     ordering_fields = ['email', 'name']
+    filterset_fields = ['id', 'name', 'email']
