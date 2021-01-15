@@ -1,9 +1,9 @@
 from rest_framework.serializers import ModelSerializer
-from .models import UserProfile
+from . import models
 
-class UserProfileSerializer(ModelSerializer):
+class UserSerializer(ModelSerializer):
     class Meta:
-        model = UserProfile
+        model = models.User
         fields = ('id', 'email', 'name', 'password')
         extra_kwargs = {
             'password':{
@@ -14,3 +14,32 @@ class UserProfileSerializer(ModelSerializer):
                 'read_only':True,
             }
         }
+
+    def create(self, validated_data):
+        """Create and return a new user"""
+        user = models.User.objects.create_user(
+            email=validated_data['email'],
+            name=validated_data['name'],
+            password=validated_data['password']
+        )
+
+        return user
+
+    def update(self, instance, validated_data):
+        """Handle updating user account"""
+        if 'password' in validated_data:
+            password = validated_data.pop('password')
+            instance.set_password(password)
+
+        return super().update(instance, validated_data)
+
+class FeedSerializer(ModelSerializer):
+    class Meta:
+        model = models.Feed
+        fields = ('id', 'user', 'text', 'created_on',)
+    
+    extra_kwargs = {
+        'user':{
+            'read_only':True,
+        },
+    }

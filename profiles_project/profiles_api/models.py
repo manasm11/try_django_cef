@@ -1,8 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.conf import settings
 
 # Create your models here.
-class UserProfileManager(BaseUserManager):
+class UserManager(BaseUserManager):
     def create_user(self, email, name, password=None):
         if not email: raise ValueError('User must have an email')
         email = self.normalize_email(email)
@@ -16,20 +17,19 @@ class UserProfileManager(BaseUserManager):
         if not password: raise ValueError('Superuser must have password')
         if not name: raise ValueError('Superuser must have name')
         if not email: raise ValueError('Superuser must have email')
-        user = self.create_user(email, name)
-        user.set_password(password)
+        user = self.create_user(email, name, password)
         user.is_superuser = True
         user.is_staff = True
         user.save(using=self._db)
         return user
 
-class UserProfile(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
-    objects = UserProfileManager()
+    objects = UserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
@@ -42,3 +42,11 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+    
+class Feed(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='feeds')
+    text = models.CharField(max_length=255)
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.text

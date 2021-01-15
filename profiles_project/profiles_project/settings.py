@@ -128,4 +128,32 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Custom User Model
-AUTH_USER_MODEL = 'profiles_api.UserProfile'
+AUTH_USER_MODEL = 'profiles_api.User'
+
+TEST_USERS_LIST = [
+            {
+                'email':'f20170546@pilani.bits-pilani.ac.in',
+                'name':'Manas Mishra',
+                'password':'testing321'
+            },
+            {
+                'email':'f20170727@pilani.bits-pilani.ac.in',
+                'name':'Divya Tyagi',
+                'password':'testing321'
+            },
+            {
+                'email':'f20170630@pilani.bits-pilani.ac.in',
+                'name':'Lakshya',
+                'password':'testing321'
+            },
+            {
+                'email':'f20170531@pilani.bits-pilani.ac.in',
+                'name':'Adya Pathak',
+                'password':'testing321'
+            },
+            {
+                'email':'f20170123@pilani.bits-pilani.ac.in',
+                'name':'Hritik Something',
+                'password':'testing321'
+            },
+        ]

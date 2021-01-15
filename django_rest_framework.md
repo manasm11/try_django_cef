@@ -711,6 +711,7 @@ class HelloViewSet(viewsets.ViewSet):
   def destroy(self, request, pk=None):
     """Delete items"""
     return Response({'destroy':'item'})
+  
 
 # urls.py
 from rest_framework.routers import DefaultRouter
@@ -736,6 +737,9 @@ class UserProfileViewSet(viewsets.ModelViewSet):
   filter_backends = (filters.SearchFilter, filters.OrderingFilter,)
   search_fields = ('email', 'name',)
   ordering_fields = ('id', 'name', 'email',)
+
+  def perform_create(self, serializer):
+    serializer.save(user=self.request.user)
 
 
 class UserLoginView(ObtainAuthToken):
